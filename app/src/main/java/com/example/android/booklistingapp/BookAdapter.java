@@ -1,22 +1,33 @@
 package com.example.android.booklistingapp;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 
 import static android.R.attr.author;
+import static com.example.android.booklistingapp.QueryUtils.createUrl;
 
 /**
  * Created by evi on 22. 6. 2017.
  */
 
 public class BookAdapter extends ArrayAdapter<Books> {
+
+    // String tag for log messages
+    public static final String LOG_TAG = BookAdapter.class.getName();
+
     public BookAdapter(Activity context, ArrayList<Books> books) {
         super(context, 0, books);
     }
@@ -46,6 +57,22 @@ public class BookAdapter extends ArrayAdapter<Books> {
         // Display the title of the current book in that TextView
         String title = currentBook.getTitle();
         titleView.setText(title);
+
+
+        // Find the ImageView with view ID cover_view
+        ImageView coverView = (ImageView) listItemView.findViewById(R.id.cover_view);
+
+        // Display the author of the current book in that TextView
+        String imageUrl = currentBook.getPictureUrl();
+
+        URL pictureUrl = createUrl(imageUrl);
+        Bitmap bmp = null;
+        try {
+            bmp = BitmapFactory.decodeStream(pictureUrl.openConnection().getInputStream());
+        } catch (IOException e) {
+            Log.e (LOG_TAG, "Error while creating cover picture");
+        }
+        coverView.setImageBitmap(bmp);
 
         // Return the list item view that is now showing the appropriate data
         return listItemView;

@@ -88,10 +88,14 @@ public final class QueryUtils {
                 // Extract the value for the key called "url" - book detail info
                 String url = volumeInfo.getString("infoLink");
 
+                // Extract the value for the key called "smallThumbnail" - book cover image
+                JSONObject imageLinks =volumeInfo.getJSONObject("imageLinks");
+                String pictureUrl = imageLinks.getString("smallThumbnail");
+
                 // Create a new {@link Book} object with the title, author and url
                 // from the JSON response.
                 // Add book to list of books
-                books.add(new Books(title, author, url));
+                books.add(new Books(title, author, url, pictureUrl));
             }
 
         } catch (JSONException e) {
@@ -101,14 +105,14 @@ public final class QueryUtils {
             Log.e("QueryUtils", "Problem parsing the book JSON results", e);
         }
 
-        // Return the list of earthquakes
+        // Return the list of books
         return books;
     }
 
     /**
      * Returns new URL object from the given string URL.
      */
-    private static URL createUrl(String stringUrl) {
+    public static URL createUrl(String stringUrl) {
         URL url = null;
         try {
             url = new URL(stringUrl);

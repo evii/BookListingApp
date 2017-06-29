@@ -16,15 +16,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Search title, keyword"/>
+            android:hint="Search title, keyword"
+            android:imeOptions="actionSend" />
 
         <Button
             android:id="@+id/search_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Search"
-            android:onClick="searchMethod"/>
+            android:onClick="submitToSearch"/>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/keyword_TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Books with title or keyword: Android"
+        />
 
 <RelativeLayout
     android:layout_width="match_parent"

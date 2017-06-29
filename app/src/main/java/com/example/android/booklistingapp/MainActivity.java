@@ -11,40 +11,48 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.net.URL;
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<List<Books>> {
 
-    // Constant value for the bbok loader ID.
+    // Constant value for the book loader ID.
     private static final int BOOK_LOADER_ID = 1;
 
-    //Adapter for the list of books
+    // Adapter for the list of books
     private BookAdapter mAdapter;
 
+    // String tag for log messages
     public static final String LOG_TAG = MainActivity.class.getName();
 
-    //URL for book data from the Google Books dataset
+    // URL for book data from the Google Books dataset. adjusted url for search on Google books
+    private String newGoogleBooksQueryUrl;
 
-    private static String GOOGLE_BOOKS_QUERY_URL =
-    "https://www.googleapis.com/books/v1/volumes?q=";
-
-    /** TextView that is displayed when the list is empty */
+    // TextView that is displayed when the list is empty
     private TextView mEmptyStateTextView;
+
+    //TODO: po otoceni, aby se nezvetsilo edittext pole
+    // TODO: chyba pri prvnim nacteni - zkontrolovat
+    //TODO: nacteni obrazku knizek implementovat
+    // TODO: po kliknuti na enter v soft klavesnici - search
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Setting the URL for the default search displayed after loading app
+        newGoogleBooksQueryUrl =  "https://www.googleapis.com/books/v1/volumes?q=android&maxResults=20";
 
         // Find a reference to the {@link ListView} in the layout
         ListView bookListView = (ListView) findViewById(R.id.list);
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         bookListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // Find the current earthquake that was clicked on
+                // Find the current book that was clicked on
                 Books currentBook = mAdapter.getItem(position);
 
                 // Convert the String URL into a URI object (to pass into the Intent constructor)
@@ -74,7 +82,8 @@ public class MainActivity extends AppCompatActivity
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, bookUri);
 
                 // Send the intent to launch a new activity
-                startActivity(websiteIntent);
+                if (websiteIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(websiteIntent);}
             }
         });
 
@@ -84,15 +93,13 @@ public class MainActivity extends AppCompatActivity
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         // Get details on the currently active default data network
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
+        final boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnected();
         // Get a reference to the LoaderManager, in order to interact with loaders.
         final LoaderManager loaderManager = getLoaderManager();
 
         // If there is a network connection, fetch data
         if(isConnected) {
-
-
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
@@ -114,8 +121,8 @@ public class MainActivity extends AppCompatActivity
          * initiating the loader
          */
         final EditText searchTextView = (EditText) findViewById(R.id.search_view);
-
         Button searchButton =(Button) findViewById(R.id.search_button);
+        final TextView keywordTextView = (TextView) findViewById(R.id.keyword_TextView);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,10 +131,18 @@ public class MainActivity extends AppCompatActivity
                 loadingIndicator.setVisibility(View.VISIBLE);
                 mEmptyStateTextView.setText("");
                 String searchText = searchTextView.getText().toString();
+                keywordTextView.setText("Books with title or keyword: " + searchText);
                 String adjSearchText = searchText.replace(" ","+");
-                GOOGLE_BOOKS_QUERY_URL = GOOGLE_BOOKS_QUERY_URL+adjSearchText+"&maxResults=20";
-                Log.e(LOG_TAG,GOOGLE_BOOKS_QUERY_URL);
-                if(isInternetConnectionAvailable()){
+                String adjGoogleBooksQueryUrl =
+                        newGoogleBooksQueryUrl.substring(0,newGoogleBooksQueryUrl.indexOf("?"));
+
+                Uri baseUri = Uri.parse(adjGoogleBooksQueryUrl);
+                Uri.Builder uriBuilder = baseUri.buildUpon();
+                uriBuilder.appendQueryParameter("q", adjSearchText);
+                uriBuilder.appendQueryParameter("maxResults", "20");
+                newGoogleBooksQueryUrl = uriBuilder.toString();
+
+                if(isConnected){
                     loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
                 }else{
                     mAdapter.clear();
@@ -137,8 +152,7 @@ public class MainActivity extends AppCompatActivity
 
                 //reset the values
                 searchTextView.setText("");
-                GOOGLE_BOOKS_QUERY_URL ="https://www.googleapis.com/books/v1/volumes?q=";
-            }
+                            }
         });
 
     }
@@ -148,7 +162,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public Loader<List<Books>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
-        return new BookLoader(this, GOOGLE_BOOKS_QUERY_URL);
+        return new BookLoader(this, newGoogleBooksQueryUrl);
     }
 
     @Override
@@ -175,13 +189,4 @@ public class MainActivity extends AppCompatActivity
         mAdapter.clear();
     }
 
-    /**
-     * checks if there is internet connection or not
-     * @return a boolean value true or false
-     */
-    private boolean isInternetConnectionAvailable(){
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
-}
