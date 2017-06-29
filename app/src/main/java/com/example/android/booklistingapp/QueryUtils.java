@@ -15,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -46,7 +45,7 @@ public final class QueryUtils {
             return null;
         }
 
-        // Create an empty ArrayList that we can start adding earthquakes to
+        // Create an empty ArrayList that we can start adding books to
         List<Books> books = new ArrayList<>();
 
         // Try to parse the JSON response string. If there's a problem with the way the JSON
@@ -76,11 +75,11 @@ public final class QueryUtils {
                 if (authorExist) {
                     JSONArray authorsArray = volumeInfo.getJSONArray("authors");
                     author = authorsArray.getString(0);
-                        for (int j = 1; j < authorsArray.length(); j++) {
-                            String coauthor = authorsArray.getString(j);
-                            author = author + ", " + coauthor;
-                        }
+                    for (int j = 1; j < authorsArray.length(); j++) {
+                        String coauthor = authorsArray.getString(j);
+                        author = author + ", " + coauthor;
                     }
+                }
 
                 // Extract “Title” for book
                 String title = volumeInfo.getString("title");
@@ -88,14 +87,10 @@ public final class QueryUtils {
                 // Extract the value for the key called "url" - book detail info
                 String url = volumeInfo.getString("infoLink");
 
-                // Extract the value for the key called "smallThumbnail" - book cover image
-                JSONObject imageLinks =volumeInfo.getJSONObject("imageLinks");
-                String pictureUrl = imageLinks.getString("smallThumbnail");
-
                 // Create a new {@link Book} object with the title, author and url
                 // from the JSON response.
                 // Add book to list of books
-                books.add(new Books(title, author, url, pictureUrl));
+                books.add(new Books(title, author, url));
             }
 
         } catch (JSONException e) {
@@ -151,7 +146,7 @@ public final class QueryUtils {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving the earthquake JSON results.", e);
+            Log.e(LOG_TAG, "Problem retrieving the google books JSON results.", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -180,6 +175,7 @@ public final class QueryUtils {
         }
         return output.toString();
     }
+
     /**
      * Query the Google Books dataset and return an object to represent a single book.
      */

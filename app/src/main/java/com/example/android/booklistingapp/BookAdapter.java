@@ -25,12 +25,10 @@ import static com.example.android.booklistingapp.QueryUtils.createUrl;
 
 public class BookAdapter extends ArrayAdapter<Books> {
 
-    // String tag for log messages
-    public static final String LOG_TAG = BookAdapter.class.getName();
-
     public BookAdapter(Activity context, ArrayList<Books> books) {
         super(context, 0, books);
     }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -57,22 +55,6 @@ public class BookAdapter extends ArrayAdapter<Books> {
         // Display the title of the current book in that TextView
         String title = currentBook.getTitle();
         titleView.setText(title);
-
-
-        // Find the ImageView with view ID cover_view
-        ImageView coverView = (ImageView) listItemView.findViewById(R.id.cover_view);
-
-        // Display the author of the current book in that TextView
-        String imageUrl = currentBook.getPictureUrl();
-
-        URL pictureUrl = createUrl(imageUrl);
-        Bitmap bmp = null;
-        try {
-            bmp = BitmapFactory.decodeStream(pictureUrl.openConnection().getInputStream());
-        } catch (IOException e) {
-            Log.e (LOG_TAG, "Error while creating cover picture");
-        }
-        coverView.setImageBitmap(bmp);
 
         // Return the list item view that is now showing the appropriate data
         return listItemView;

@@ -9,15 +9,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +27,6 @@ public class MainActivity extends AppCompatActivity
 
     // Adapter for the list of books
     private BookAdapter mAdapter;
-
-    // String tag for log messages
-    public static final String LOG_TAG = MainActivity.class.getName();
 
     // URL for book data from the Google Books dataset. adjusted url for search on Google books
     private String newGoogleBooksQueryUrl;
@@ -52,7 +46,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         // Setting the URL for the default search displayed after loading app
-        newGoogleBooksQueryUrl =  "https://www.googleapis.com/books/v1/volumes?q=android&maxResults=20";
+        newGoogleBooksQueryUrl = "https://www.googleapis.com/books/v1/volumes?q=android&maxResults=20";
 
         // Find a reference to the {@link ListView} in the layout
         ListView bookListView = (ListView) findViewById(R.id.list);
@@ -83,7 +77,8 @@ public class MainActivity extends AppCompatActivity
 
                 // Send the intent to launch a new activity
                 if (websiteIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(websiteIntent);}
+                    startActivity(websiteIntent);
+                }
             }
         });
 
@@ -99,12 +94,12 @@ public class MainActivity extends AppCompatActivity
         final LoaderManager loaderManager = getLoaderManager();
 
         // If there is a network connection, fetch data
-        if(isConnected) {
+        if (isConnected) {
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
-            loaderManager.initLoader(BOOK_LOADER_ID, null, this);}
-        else {
+            loaderManager.initLoader(BOOK_LOADER_ID, null, this);
+        } else {
             // Otherwise, display error
             // Update empty state with no connection error message
             mEmptyStateTextView.setText(R.string.no_internet_connection);
@@ -113,7 +108,7 @@ public class MainActivity extends AppCompatActivity
             View loadingIndicator = findViewById(R.id.progressbar_view);
             loadingIndicator.setVisibility(View.GONE);
 
-       }
+        }
 
         /**
          * setting an onClickListener on the search button
@@ -121,7 +116,7 @@ public class MainActivity extends AppCompatActivity
          * initiating the loader
          */
         final EditText searchTextView = (EditText) findViewById(R.id.search_view);
-        Button searchButton =(Button) findViewById(R.id.search_button);
+        Button searchButton = (Button) findViewById(R.id.search_button);
         final TextView keywordTextView = (TextView) findViewById(R.id.keyword_TextView);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,9 +127,9 @@ public class MainActivity extends AppCompatActivity
                 mEmptyStateTextView.setText("");
                 String searchText = searchTextView.getText().toString();
                 keywordTextView.setText("Books with title or keyword: " + searchText);
-                String adjSearchText = searchText.replace(" ","+");
+                String adjSearchText = searchText.replace(" ", "+");
                 String adjGoogleBooksQueryUrl =
-                        newGoogleBooksQueryUrl.substring(0,newGoogleBooksQueryUrl.indexOf("?"));
+                        newGoogleBooksQueryUrl.substring(0, newGoogleBooksQueryUrl.indexOf("?"));
 
                 Uri baseUri = Uri.parse(adjGoogleBooksQueryUrl);
                 Uri.Builder uriBuilder = baseUri.buildUpon();
@@ -142,9 +137,9 @@ public class MainActivity extends AppCompatActivity
                 uriBuilder.appendQueryParameter("maxResults", "20");
                 newGoogleBooksQueryUrl = uriBuilder.toString();
 
-                if(isConnected){
+                if (isConnected) {
                     loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
-                }else{
+                } else {
                     mAdapter.clear();
                     loadingIndicator.setVisibility(View.GONE);
                     mEmptyStateTextView.setText(R.string.no_internet_connection);
@@ -152,12 +147,10 @@ public class MainActivity extends AppCompatActivity
 
                 //reset the values
                 searchTextView.setText("");
-                            }
+            }
         });
 
     }
-
-
 
     @Override
     public Loader<List<Books>> onCreateLoader(int i, Bundle bundle) {
@@ -173,7 +166,7 @@ public class MainActivity extends AppCompatActivity
 
         // Set empty state text to display "No books found."
         mEmptyStateTextView.setText(R.string.no_books);
-        // Clear the adapter of previous earthquake data
+        // Clear the adapter of previous book data
         mAdapter.clear();
 
         // If there is a valid list of {@link Books, then add them to the adapter's
@@ -188,5 +181,4 @@ public class MainActivity extends AppCompatActivity
         // Loader reset, so we can clear out our existing data.
         mAdapter.clear();
     }
-
-    }
+}
