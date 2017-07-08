@@ -9,6 +9,7 @@ final public class Books {
     private String mTitle;
     private String mAuthor;
     private String mUrl;
+    private String mPictureUrl;
 
     /**
      * Constructs a new {@link Books} object.
@@ -17,10 +18,11 @@ final public class Books {
      * @param author is the author of the book
      * @param url    is the website URL to find more details about the book
      */
-    public Books(String title, String author, String url) {
+    public Books(String title, String author, String url, String pictureUrl) {
         mTitle = title;
         mAuthor = author;
         mUrl = url;
+        mPictureUrl = pictureUrl;
     }
 
     //Returns the title of the book.
@@ -36,5 +38,10 @@ final public class Books {
     //Returns the website URL to find more information about the book.
     public String getUrl() {
         return mUrl;
+    }
+
+    // Returns url for picture of the cover of the book
+    public String getPictureUrl() {
+    return mPictureUrl;
     }
 }

@@ -71,8 +71,8 @@ public final class QueryUtils {
 
                 // Extract “Author” for book
                 String author = "";
-                boolean authorExist = volumeInfo.has("authors");
-                if (authorExist) {
+                boolean authorExists = volumeInfo.has("authors");
+                if (authorExists) {
                     JSONArray authorsArray = volumeInfo.getJSONArray("authors");
                     author = authorsArray.getString(0);
                     for (int j = 1; j < authorsArray.length(); j++) {
@@ -83,21 +83,26 @@ public final class QueryUtils {
 
                 // Extract “Title” for book
                 String title = "";
-                boolean titleExist = volumeInfo.has("title");
-                if (titleExist) {
+                boolean titleExists = volumeInfo.has("title");
+                if (titleExists) {
                 title = volumeInfo.getString("title");
                 }
 
                 // Extract the value for the key called "url" - book detail info
                 String url = "";
-                boolean urlExist = volumeInfo.has("infolink");
-                if (urlExist) {
+                boolean urlExists = volumeInfo.has("infolink");
+                if (urlExists) {
                 url = volumeInfo.getString("infoLink"); }
+
+
+                // Extract the value for the key called "smallThumbnail" - book cover image
+                JSONObject imageLinks =volumeInfo.getJSONObject("imageLinks");
+                String pictureUrl = imageLinks.getString("smallThumbnail");
 
                 // Create a new {@link Book} object with the title, author and url
                 // from the JSON response.
                 // Add book to list of books
-                books.add(new Books(title, author, url));
+                books.add(new Books(title, author, url, pictureUrl));
             }
 
         } catch (JSONException e) {
