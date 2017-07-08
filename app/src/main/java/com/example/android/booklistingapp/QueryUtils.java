@@ -96,8 +96,11 @@ public final class QueryUtils {
 
 
                 // Extract the value for the key called "smallThumbnail" - book cover image
-                JSONObject imageLinks =volumeInfo.getJSONObject("imageLinks");
-                String pictureUrl = imageLinks.getString("smallThumbnail");
+                JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
+                String pictureUrl = "";
+                boolean pictureUrlExists = imageLinks.has("smallThumbnail");
+                if(pictureUrlExists){
+                pictureUrl = imageLinks.getString("smallThumbnail");}
 
                 // Create a new {@link Book} object with the title, author and url
                 // from the JSON response.
