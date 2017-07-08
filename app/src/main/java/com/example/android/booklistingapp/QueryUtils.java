@@ -82,10 +82,17 @@ public final class QueryUtils {
                 }
 
                 // Extract “Title” for book
-                String title = volumeInfo.getString("title");
+                String title = "";
+                boolean titleExist = volumeInfo.has("title");
+                if (titleExist) {
+                title = volumeInfo.getString("title");
+                }
 
                 // Extract the value for the key called "url" - book detail info
-                String url = volumeInfo.getString("infoLink");
+                String url = "";
+                boolean urlExist = volumeInfo.has("infolink");
+                if (urlExist) {
+                url = volumeInfo.getString("infoLink"); }
 
                 // Create a new {@link Book} object with the title, author and url
                 // from the JSON response.

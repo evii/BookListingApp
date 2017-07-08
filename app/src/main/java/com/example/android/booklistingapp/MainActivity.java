@@ -19,6 +19,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+
+//TODO: nacteni obrazku knizek implementovat
+// TODO: po kliknuti na enter v soft klavesnici - search
+// TODO: zmensit edittext pri zmene orientace
+
+
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<List<Books>> {
 
@@ -34,11 +40,8 @@ public class MainActivity extends AppCompatActivity
     // TextView that is displayed when the list is empty
     private TextView mEmptyStateTextView;
 
-    //TODO: po otoceni, aby se nezvetsilo edittext pole
-    // TODO: chyba pri prvnim nacteni - zkontrolovat
-    //TODO: nacteni obrazku knizek implementovat
-    // TODO: po kliknuti na enter v soft klavesnici - search
-
+    // Connectivity Manager to check the internet connection
+    private ConnectivityManager mConnectivityManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,10 @@ public class MainActivity extends AppCompatActivity
 
         // Create a new adapter that takes an empty list of books as input
         mAdapter = new BookAdapter(this, new ArrayList<Books>());
+
+        // Instantiate Connectivity Manager to check the connection - isConnected
+        mConnectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
@@ -82,13 +89,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // Check internet connection
-        // Get a reference to the ConnectivityManager to check state of network connectivity
-        ConnectivityManager cm = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
         // Get details on the currently active default data network
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        final boolean isConnected = activeNetwork != null &&
+        NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnected();
         // Get a reference to the LoaderManager, in order to interact with loaders.
         final LoaderManager loaderManager = getLoaderManager();
@@ -136,6 +139,12 @@ public class MainActivity extends AppCompatActivity
                 uriBuilder.appendQueryParameter("q", adjSearchText);
                 uriBuilder.appendQueryParameter("maxResults", "20");
                 newGoogleBooksQueryUrl = uriBuilder.toString();
+
+                // Check internet connection
+                // Get details on the currently active default data network
+                NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnected();
 
                 if (isConnected) {
                     loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
