@@ -28,49 +28,58 @@ import static com.example.android.booklistingapp.QueryUtils.createUrl;
 
 public class BookAdapter extends ArrayAdapter<Books> {
 
+    // View lookup cache
+    private static class ViewHolder {
+        TextView authorView;
+        TextView titleView;
+        ImageView coverImageView;
+    }
     public BookAdapter(Activity context, ArrayList<Books> books) {
         super(context, 0, books);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        // Find the book at the given position in the list of books
+        Books currentBook = getItem(position);
 
         // Check if there is an existing list item view (called convertView) that we can reuse,
         // otherwise, if convertView is null, then inflate a new list item layout.
-        View listItemView = convertView;
-        if (listItemView == null) {
-            listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.list_item, parent, false);
-        }
-
+        ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {
-            // Find the book at the given position in the list of books
-            Books currentBook = getItem(position);
+            viewHolder = new ViewHolder();
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            convertView = inflater.inflate(R.layout.list_item, parent, false);
 
             // Find the TextView with view ID author
-            TextView authorView = (TextView) listItemView.findViewById(R.id.author_view);
+            viewHolder.authorView = (TextView) convertView.findViewById(R.id.author_view);
+            viewHolder.titleView = (TextView) convertView.findViewById(R.id.title_view);
+            viewHolder.coverImageView = (ImageView) convertView.findViewById(R.id.cover_ImageView);
+
+            // Cache the viewHolder object inside the fresh view
+            convertView.setTag(viewHolder);
+        } else {
+            // View is being recycled, retrieve the viewHolder object from tag
+            viewHolder = (ViewHolder) convertView.getTag(); }
 
             // Display the author of the current book in that TextView
             String author = currentBook.getAuthor();
-            authorView.setText(author);
+            viewHolder.authorView.setText(author);
 
-            // Find the TextView with view ID title
-            TextView titleView = (TextView) listItemView.findViewById(R.id.title_view);
-
-            // Display the title of the current book in that TextView
+                        // Display the title of the current book in that TextView
             String title = currentBook.getTitle();
-            titleView.setText(title);
+            viewHolder.titleView.setText(title);
 
             // Find the ImageView dedicated to the bookcover
-            ImageView coverImageView = (ImageView) listItemView.findViewById(R.id.cover_ImageView);
+
             String pictureUrl = currentBook.getPictureUrl();
 
             AsyncTask<ImageView, Void, Bitmap> imageViewVoidBitmapAsyncTask = new DownloadImagesTask(pictureUrl)
-                    .execute(coverImageView);
+                    .execute(viewHolder.coverImageView);
 
-        }
+
         // Return the list item view that is now showing the appropriate data
-        return listItemView;
+        return convertView;
     }
 
 
