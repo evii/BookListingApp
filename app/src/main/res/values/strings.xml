@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BookListingApp</string>
+    <string name="app_name">Find your book on Google books.</string>
     <string name="no_internet_connection">No internet connection.</string>
     <string name="no_books">No books found.</string>
     <string name="title_keyword_default">Books with title or keyword: Android</string>
