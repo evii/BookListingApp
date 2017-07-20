@@ -9,20 +9,21 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.view.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
-//TODO: nacteni obrazku knizek implementovat
-// TODO: po kliknuti na enter v soft klavesnici - search
-// TODO: zmensit edittext pri zmene orientace
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 
 public class MainActivity extends AppCompatActivity
@@ -42,6 +43,12 @@ public class MainActivity extends AppCompatActivity
 
     // Connectivity Manager to check the internet connection
     private ConnectivityManager mConnectivityManager;
+
+    EditText searchTextView;
+    TextView keywordTextView;
+    LoaderManager loaderManager;
+    public static final String LOG_TAG = MainActivity.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +85,7 @@ public class MainActivity extends AppCompatActivity
 
                 // Convert the String URL into a URI object (to pass into the Intent constructor)
                 Uri bookUri = Uri.parse(currentBook.getUrl());
-
+Log.v(LOG_TAG, "uri: " + bookUri.toString());
                 // Create a new intent to view the book URI
                 Intent websiteIntent = new Intent(Intent.ACTION_VIEW, bookUri);
 
@@ -94,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnected();
         // Get a reference to the LoaderManager, in order to interact with loaders.
-        final LoaderManager loaderManager = getLoaderManager();
+        loaderManager = getLoaderManager();
 
         // If there is a network connection, fetch data
         if (isConnected) {
@@ -110,7 +117,6 @@ public class MainActivity extends AppCompatActivity
             // Hide loading indicator so error message will be visible
             View loadingIndicator = findViewById(R.id.progressbar_view);
             loadingIndicator.setVisibility(View.GONE);
-
         }
 
         /**
@@ -118,47 +124,74 @@ public class MainActivity extends AppCompatActivity
          * appending the searched term to the default url
          * initiating the loader
          */
-        final EditText searchTextView = (EditText) findViewById(R.id.search_view);
+        searchTextView = (EditText) findViewById(R.id.search_view);
         Button searchButton = (Button) findViewById(R.id.search_button);
-        final TextView keywordTextView = (TextView) findViewById(R.id.keyword_TextView);
+        keywordTextView = (TextView) findViewById(R.id.keyword_TextView);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAdapter.clear();
-                View loadingIndicator = findViewById(R.id.progressbar_view);
-                loadingIndicator.setVisibility(View.VISIBLE);
-                mEmptyStateTextView.setText("");
-                String searchText = searchTextView.getText().toString();
-                keywordTextView.setText("Books with title or keyword: " + searchText);
-                String adjSearchText = searchText.replace(" ", "+");
-                String adjGoogleBooksQueryUrl =
-                        newGoogleBooksQueryUrl.substring(0, newGoogleBooksQueryUrl.indexOf("?"));
+                startSearch();
 
-                Uri baseUri = Uri.parse(adjGoogleBooksQueryUrl);
-                Uri.Builder uriBuilder = baseUri.buildUpon();
-                uriBuilder.appendQueryParameter("q", adjSearchText);
-                uriBuilder.appendQueryParameter("maxResults", "20");
-                newGoogleBooksQueryUrl = uriBuilder.toString();
-
-                // Check internet connection
-                // Get details on the currently active default data network
-                NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-                boolean isConnected = activeNetwork != null &&
-                        activeNetwork.isConnected();
-
-                if (isConnected) {
-                    loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
-                } else {
-                    mAdapter.clear();
-                    loadingIndicator.setVisibility(View.GONE);
-                    mEmptyStateTextView.setText(R.string.no_internet_connection);
-                }
-
-                //reset the values
-                searchTextView.setText("");
             }
         });
 
+
+        // performs search even after pressing enter button on the keyboard
+        searchTextView.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    startSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+    }
+
+    // method for executing search
+    public void startSearch() {
+        mAdapter.clear();
+        View loadingIndicator = findViewById(R.id.progressbar_view);
+        loadingIndicator.setVisibility(View.VISIBLE);
+        mEmptyStateTextView.setText("");
+        String searchText = searchTextView.getText().toString();
+        keywordTextView.setText("Books with title or keyword: " + searchText);
+        String adjSearchText = searchText.replace(" ", "+");
+        String adjGoogleBooksQueryUrl =
+                newGoogleBooksQueryUrl.substring(0, newGoogleBooksQueryUrl.indexOf("?"));
+
+        Uri baseUri = Uri.parse(adjGoogleBooksQueryUrl);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+        uriBuilder.appendQueryParameter("q", adjSearchText);
+        uriBuilder.appendQueryParameter("maxResults", "20");
+        newGoogleBooksQueryUrl = uriBuilder.toString();
+
+        // Check internet connection
+        // Get details on the currently active default data network
+        NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnected();
+
+        if (isConnected) {
+            loaderManager.restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
+        } else {
+            mAdapter.clear();
+            loadingIndicator.setVisibility(View.GONE);
+            mEmptyStateTextView.setText(R.string.no_internet_connection);
+        }
+
+        //reset the values
+        searchTextView.setText("");
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        //closing soft keyboard
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     @Override

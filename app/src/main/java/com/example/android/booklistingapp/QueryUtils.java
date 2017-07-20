@@ -90,10 +90,9 @@ public final class QueryUtils {
 
                 // Extract the value for the key called "url" - book detail info
                 String url = "";
-                boolean urlExists = volumeInfo.has("infolink");
+                boolean urlExists = volumeInfo.has("infoLink");
                 if (urlExists) {
                 url = volumeInfo.getString("infoLink"); }
-
 
                 // Extract the value for the key called "smallThumbnail" - book cover image
                 JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
@@ -213,5 +212,7 @@ public final class QueryUtils {
         // Return the {@link Event}
         return books;
     }
+
+
 }
 

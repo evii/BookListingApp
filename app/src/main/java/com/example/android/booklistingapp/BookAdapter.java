@@ -13,16 +13,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-
-import static android.R.attr.author;
-import static com.example.android.booklistingapp.QueryUtils.createUrl;
-import static com.example.android.booklistingapp.R.id.author_view;
 
 /**
  * Created by evi on 22. 6. 2017.
@@ -57,7 +52,6 @@ public class BookAdapter extends ArrayAdapter<Books> {
 
         AsyncTask<ImageView, Void, Bitmap> imageViewVoidBitmapAsyncTask = new DownloadImagesTask(currentBook.getPictureUrl())
                 .execute(viewHolder.coverImageView);
-
 
         // Return the list item view that is now showing the appropriate data
         return convertView;

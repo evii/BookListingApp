@@ -9,40 +9,40 @@
         android:id="@+id/cover_ImageView"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:paddingTop="@dimen/padding"
-        android:paddingRight="@dimen/padding"
         android:paddingLeft="@dimen/padding"
-        tools:src="@mipmap/ic_launcher"/>
+        android:paddingRight="@dimen/padding"
+        android:paddingTop="@dimen/padding"
+        tools:src="@mipmap/ic_launcher" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/author_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
-        android:maxLines="1"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="16dp"
-        android:textAllCaps="true"
-        android:textSize="12sp"
-        tools:text="Author" />
+        <TextView
+            android:id="@+id/author_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="16dp"
+            android:textAllCaps="true"
+            android:textSize="12sp"
+            tools:text="Author" />
 
-    <TextView
-        android:id="@+id/title_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="2"
-        android:paddingBottom="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:textSize="20sp"
-        tools:text="Title title title title title title title title title title title title title title title title title" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/title_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:paddingBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textSize="20sp"
+            tools:text="Title title title title title title title title title title title title title title title title title" />
+    </LinearLayout>
 </LinearLayout>

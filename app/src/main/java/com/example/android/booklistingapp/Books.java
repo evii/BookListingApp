@@ -42,6 +42,6 @@ final public class Books {
 
     // Returns url for picture of the cover of the book
     public String getPictureUrl() {
-    return mPictureUrl;
+        return mPictureUrl;
     }
 }
