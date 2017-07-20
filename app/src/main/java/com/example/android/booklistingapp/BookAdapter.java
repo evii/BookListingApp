@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 
 import static android.R.attr.author;
 import static com.example.android.booklistingapp.QueryUtils.createUrl;
+import static com.example.android.booklistingapp.R.id.author_view;
 
 /**
  * Created by evi on 22. 6. 2017.
@@ -28,12 +30,6 @@ import static com.example.android.booklistingapp.QueryUtils.createUrl;
 
 public class BookAdapter extends ArrayAdapter<Books> {
 
-    // View lookup cache
-    private static class ViewHolder {
-        TextView authorView;
-        TextView titleView;
-        ImageView coverImageView;
-    }
     public BookAdapter(Activity context, ArrayList<Books> books) {
         super(context, 0, books);
     }
@@ -45,44 +41,29 @@ public class BookAdapter extends ArrayAdapter<Books> {
 
         // Check if there is an existing list item view (called convertView) that we can reuse,
         // otherwise, if convertView is null, then inflate a new list item layout.
-        ViewHolder viewHolder; // view lookup cache stored in tag
+        ViewHolder viewHolder;
         if (convertView == null) {
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.list_item, parent, false);
+            convertView = LayoutInflater.from(getContext())
+                    .inflate(R.layout.list_item, parent, false);
 
-            // Find the TextView with view ID author
-            viewHolder.authorView = (TextView) convertView.findViewById(R.id.author_view);
-            viewHolder.titleView = (TextView) convertView.findViewById(R.id.title_view);
-            viewHolder.coverImageView = (ImageView) convertView.findViewById(R.id.cover_ImageView);
-
-            // Cache the viewHolder object inside the fresh view
+            viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         } else {
-            // View is being recycled, retrieve the viewHolder object from tag
-            viewHolder = (ViewHolder) convertView.getTag(); }
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
 
-            // Display the author of the current book in that TextView
-            String author = currentBook.getAuthor();
-            viewHolder.authorView.setText(author);
+        viewHolder.authorView.setText(currentBook.getAuthor());
+        viewHolder.titleView.setText(currentBook.getTitle());
 
-                        // Display the title of the current book in that TextView
-            String title = currentBook.getTitle();
-            viewHolder.titleView.setText(title);
-
-            // Find the ImageView dedicated to the bookcover
-
-            String pictureUrl = currentBook.getPictureUrl();
-
-            AsyncTask<ImageView, Void, Bitmap> imageViewVoidBitmapAsyncTask = new DownloadImagesTask(pictureUrl)
-                    .execute(viewHolder.coverImageView);
+        AsyncTask<ImageView, Void, Bitmap> imageViewVoidBitmapAsyncTask = new DownloadImagesTask(currentBook.getPictureUrl())
+                .execute(viewHolder.coverImageView);
 
 
         // Return the list item view that is now showing the appropriate data
         return convertView;
     }
 
-
+    // AsyncTask for downaloda of images
     public class DownloadImagesTask extends AsyncTask<ImageView, Void, Bitmap> {
 
         private ImageView imageView;
@@ -125,4 +106,19 @@ public class BookAdapter extends ArrayAdapter<Books> {
         }
     }
 
+    // Viewholder implementation
+    class ViewHolder {
+        private TextView authorView;
+        private TextView titleView;
+        private ImageView coverImageView;
+
+        public ViewHolder(@NonNull View view) {
+            this.authorView = (TextView) view
+                    .findViewById(R.id.author_view);
+            this.titleView = (TextView) view
+                    .findViewById(R.id.title_view);
+            this.coverImageView = (ImageView) view
+                    .findViewById(R.id.cover_ImageView);
+        }
+    }
 }
